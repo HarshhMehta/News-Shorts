@@ -1,5 +1,4 @@
-import React from 'react';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import NewsCard from './components/NewsCard';
 
@@ -10,6 +9,8 @@ function App() {
   const [category, setCategory] = useState('general');
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // Original categories mapped to NYT sections:
+  // general -> home, entertainment -> arts (NYT uses "arts" instead of "entertainment")
   const categories = [
     'general',
     'business',
@@ -20,17 +21,32 @@ function App() {
     'health'
   ];
 
+  // Map your category values to NYT sections
+  const categoryMapping = {
+    general: 'home',
+    business: 'business',
+    technology: 'technology',
+    entertainment: 'arts',
+    sports: 'sports',
+    science: 'science',
+    health: 'health'
+  };
+
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const response = await axios.get('https://newsapi.org/v2/top-headlines', {
+        // Get the mapped NYT section
+        const nytSection = categoryMapping[category] || 'home';
+        // NYT Top Stories API endpoint
+        const url = `https://api.nytimes.com/svc/topstories/v2/${nytSection}.json`;
+
+        const response = await axios.get(url, {
           params: {
-            country: 'us',
-            category: category,
-            apiKey: import.meta.env.VITE_NEWS_API_KEY,
+            'api-key': import.meta.env.VITE_NYT_API_KEY,
           },
         });
-        setArticles(response.data.articles);
+        // NYT returns articles in the "results" array
+        setArticles(response.data.results || []);
         setCurrentIndex(0);
         setLoading(false);
       } catch (err) {
