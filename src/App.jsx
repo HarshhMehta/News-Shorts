@@ -27,7 +27,7 @@ function App() {
           params: {
             country: 'us',
             category: category,
-            apiKey: import.meta.env.VITE_NEWS_API_KEY,
+            apiKey: import.meta.env.NEWS_API_KEY,
           },
         });
         setArticles(response.data.articles);
